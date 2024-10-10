@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: #333;
+        }
+
+        header {
+            background: #210e29;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header img {
+            width: 100px;
+            position: absolute;
+            left: 40px;
+            top: 10px;
+            border-radius: 30%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        a.logout {
+            position: absolute;
+            right: 20px;
+            top: 30px;
+            color: #ffcc00;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        a.logout:hover {
+            color: #ffd700;
+        }
+
+        main {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #340049;
+            border-bottom: 2px solid #340049;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #340049;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s, background-color 0.3s;
+            background-color: #ffffff;
+        }
+
+        textarea:focus {
+            border-color: #0066cc;
+            background-color: #e6f0ff;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            background: linear-gradient(145deg, #0066cc, #005bb5);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-group button:hover {
+            background: linear-gradient(145deg, #005bb5, #004a9a);
+            transform: translateY(-2px);
+        }
+
+        .button-group button:active {
+            background: linear-gradient(145deg, #004a9a, #003d7a);
+            transform: translateY(0);
+        }
+
+        #results, #chat-history {
+            margin-top: 50px;
+        }
+
+        #results {
+            padding: 50px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: auto; /* Permet le défilement en cas de débordement */
+            max-height: 500px; /* Hauteur maximale pour les résultats */
+            white-space: pre-wrap; /* Gère les espaces et les sauts de ligne */
+        }
+
+        #chat-history {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f1f1f1;
+            border-left: 5px solid #0066cc;
+            border-radius: 5px;
+        }
+
+        .message.sent {
+            background-color: #e1f5fe;
+            border-left: 4px solid #03a9f4;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .message.received {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        footer {
+            background: #340049;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #ffcc00;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #ffd700;
+        }
+
+        footer p {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        p.username-greeting {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #340049;
+            background-color: #f7e5ff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        p.username-greeting:hover {
+            transform: scale(1.05);
+        }
+
+        .reset-button {
+            background: linear-gradient(145deg, #ff5722, #e64a19);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .reset-button:hover {
+            background: linear-gradient(145deg, #e64a19, #d84315);
+            transform: translateY(-2px);
+        }
+
+        .reset-button:active {
+            background: linear-gradient(145deg, #d84315, #c62828);
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/bkam.png') }}"alt="Logo">
+        <h1>ASSISTANT CODE OF BANK-AL-MAGHRIB</h1>
+        <a href="{{ url_for('main.logout') }}" class="logout">Se déconnecter</a>
+    </header>
+    <p class="username-greeting">Bonjour, {{ username }}!</p>
+
+    <main>
+        <form id="code-form">
+            <textarea name="code" placeholder="Collez votre code ici" rows="10"></textarea>
+            <div class="button-group">
+                <button type="button" id="generate-tests">Générer Tests</button>
+                <button type="button" id="generate-docs">Générer Documentation</button>
+                <button type="button" id="optimize-code">Optimiser Code</button>
+            </div>
+            <textarea id="description" name="description" placeholder="Décrivez la tâche que vous souhaitez automatiser" rows="3"></textarea>
+            <div class="button-group">
+                <button type="button" id="generate-code">Générer Code</button>
+                <button type="button" id="reset-button" class="reset-button">Réinitialiser</button>
+            </div>
+        </form>
+      
+        <h2>Results</h2>
+        <div id="results"></div>
+        <h2>Historique de Chat</h2>
+        <div id="chat-history">
+            <!-- Messages will be dynamically added here -->
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Bank Al-Maghrib. Tous droits réservés.</p>
+        <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a> | <a href="#">Contact</a></p>
+        <p><a href="#">https://www.bkam.ma/</a></p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.getElementById('reset-button').addEventListener('click', function() {
+            document.getElementById('code-form').reset(); // Réinitialise le formulaire
+            document.getElementById('results').innerHTML = ''; // Vide les résultats
+            document.getElementById('chat-history').innerHTML = ''; // Vide l'historique de chat
+        });
+    </script>
+</body>
+</html>
